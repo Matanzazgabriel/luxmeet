@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LuxMeet - Conexões Exclusivas</title>
+<style>
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: radial-gradient(circle at top left, #3b0764, #0f172a 70%);
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* MENU */
+.menu {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 40px;
+}
+.menu button {
+  background: rgba(55, 65, 81, 0.8);
+  border: none;
+  color: #e5e7eb;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.menu button:hover {
+  background: #7c3aed;
+  color: white;
+}
+
+/* CARD PRINCIPAL */
+.card {
+  background: rgba(31, 41, 55, 0.9);
+  padding: 35px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 900px;
+  text-align: center;
+  box-shadow: 0 0 25px rgba(167, 139, 250, 0.25);
+  margin-top: 25px;
+}
+
+h1, h2 {
+  color: #c4b5fd;
+  margin-bottom: 25px;
+}
+
+/* PERFIS */
+.perfil-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+.perfil-card {
+  background: rgba(55, 65, 81, 0.85);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: 0.3s;
+}
+.perfil-card:hover {
+  background: rgba(107, 33, 168, 0.6);
+  transform: translateY(-5px);
+}
+img.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid #a78bfa;
+}
+.perfil-card h3 {
+  color: #a78bfa;
+  margin: 5px 0;
+}
+.perfil-card p {
+  margin: 3px 0;
+  color: #e5e7eb;
+  font-size: 14px;
+}
+.perfil-card .evento {
+  color: #c084fc;
+  font-size: 13px;
+}
+.perfil-card button {
+  background: #7c3aed;
+  border: none;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 14px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.perfil-card button:hover {
+  background: #6d28d9;
+}
+
+/* OUTRAS TELAS */
+.hidden { display: none; }
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border: none;
+  border-radius: 6px;
+  background: #374151;
+  color: white;
+}
+button {
+  cursor: pointer;
+}
+.chat-box {
+  background: rgba(55, 65, 81, 0.7);
+  border-radius: 8px;
+  padding: 10px;
+  height: 250px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="card" style="max-width:400px;margin-top:80px;">
+  <h1>LuxMeet</h1>
+  <p>Conecte-se a pessoas e experiências exclusivas</p>
+  <input type="email" id="email" placeholder="E-mail">
+  <input type="password" id="senha" placeholder="Senha">
+  <button onclick="entrar()">Entrar</button>
+</div>
+
+<!-- MENU PRINCIPAL -->
+<div id="menuPrincipal" class="hidden menu">
+  <button onclick="mostrarTela('explorar')">Explorar</button>
+  <button onclick="mostrarTela('historico')">Histórico</button>
+  <button onclick="mostrarTela('perfil')">Meu Perfil</button>
+  <button onclick="voltarLogin()">Sair</button>
+</div>
+
+<!-- EXPLORAR -->
+<div id="explorar" class="hidden card">
+  <h2>Explorar Conexões</h2>
+  <div id="perfilContainer" class="perfil-list"></div>
+</div>
+
+<!-- CHAT -->
+<div id="chat" class="hidden card">
+  <h2 id="chatCom"></h2>
+  <div id="chatBox" class="chat-box"></div>
+  <input type="text" id="msgInput" placeholder="Digite sua mensagem...">
+  <button onclick="enviarMensagem()">Enviar</button>
+  <button onclick="voltarExplorar()" style="background:#374151;margin-top:10px;">Voltar</button>
+</div>
+
+<!-- HISTÓRICO -->
+<div id="historico" class="hidden card">
+  <h2>Histórico de Conversas</h2>
+  <div id="listaHistorico"></div>
+</div>
+
+<!-- PERFIL -->
+<div id="perfil" class="hidden card perfil-detalhes">
+  <h2>Meu Perfil</h2>
+  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" alt="Usuário" style="border-radius:50%;width:120px;height:120px;">
+  <h3 id="perfilNome">Isabela M.</h3>
+  <p id="perfilEmail">teste@luxmeet.com</p>
+  <p>Cidade: São Paulo</p>
+  <p>Eventos favoritos: Networking, gastronomia e arte.</p>
+</div>
+
+<script>
+const usuario = { nome: "Isabela M.", email: "teste@luxmeet.com", senha: "1234" };
+
+const perfis = [
+  { nome: "Lucas Andrade", cidade: "Rio de Janeiro", evento: "Evento de networking", img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200" },
+  { nome: "Kamila Torres", cidade: "Belo Horizonte", evento: "Viagem gastronômica", img: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=200" },
+  { nome: "Eduardo Pereira", cidade: "Curitiba", evento: "Jantar exclusivo", img: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?w=200" },
+  { nome: "Josefina Lima", cidade: "Salvador", evento: "Passeio cultural", img: "https://images.unsplash.com/photo-1559828209-669441c97eea?auto=format&fit=crop&q=80&w=870" }
+];
+
+let perfilSelecionado = null;
+let historico = [];
+
+function entrar() {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+  if (email === usuario.email && senha === usuario.senha) {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("menuPrincipal").classList.remove("hidden");
+    mostrarTela('explorar');
+    carregarPerfis();
+  } else {
+    alert("Credenciais inválidas!");
+  }
+}
+
+function mostrarTela(id) {
+  document.querySelectorAll(".card").forEach(c => c.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  if (id === "historico") carregarHistorico();
+}
+
+function carregarPerfis() {
+  const container = document.getElementById("perfilContainer");
+  container.innerHTML = "";
+  perfis.forEach((p, i) => {
+    const card = document.createElement("div");
+    card.className = "perfil-card";
+    card.innerHTML = `
+      <img src="${p.img}" class="avatar" alt="${p.nome}">
+      <h3>${p.nome}</h3>
+      <p>${p.cidade}</p>
+      <p class="evento">${p.evento}</p>
+      <button onclick="abrirChat(${i})">Chat</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function abrirChat(index) {
+  perfilSelecionado = perfis[index];
+  mostrarTela('chat');
+  document.getElementById("chatCom").innerText = "Chat com " + perfilSelecionado.nome;
+  document.getElementById("chatBox").innerHTML = `<p style="text-align:center;color:#ccc;">Inicie uma conversa elegante e respeitosa.</p>`;
+}
+
+function enviarMensagem() {
+  const msgInput = document.getElementById("msgInput");
+  const chatBox = document.getElementById("chatBox");
+  const texto = msgInput.value.trim();
+  if (!texto) return;
+
+  const msg = document.createElement("div");
+  msg.className = "msg usuario";
+  msg.innerText = "Você: " + texto;
+  chatBox.appendChild(msg);
+  msgInput.value = "";
+
+  setTimeout(() => {
+    const resp = document.createElement("div");
+    resp.className = "msg";
+    resp.innerText = perfilSelecionado.nome + ": Que interessante!";
+    chatBox.appendChild(resp);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    historico.push({ nome: perfilSelecionado.nome, ultimaMsg: texto });
+    salvarHistorico();
+  }, 700);
+}
+
+function salvarHistorico() {
+  localStorage.setItem("luxmeet_historico", JSON.stringify(historico));
+}
+
+function carregarHistorico() {
+  const lista = document.getElementById("listaHistorico");
+  historico = JSON.parse(localStorage.getItem("luxmeet_historico") || "[]");
+  lista.innerHTML = "";
+  if (historico.length === 0) {
+    lista.innerHTML = "<p style='color:#aaa;'>Nenhuma conversa registrada ainda.</p>";
+  } else {
+    historico.forEach(h => {
+      const div = document.createElement("div");
+      div.className = "perfil-card";
+      div.innerHTML = `<strong>${h.nome}</strong><br><small>Última mensagem: ${h.ultimaMsg}</small>`;
+      lista.appendChild(div);
+    });
+  }
+}
+
+function voltarExplorar() { mostrarTela('explorar'); }
+function voltarLogin() {
+  document.getElementById("menuPrincipal").classList.add("hidden");
+  document.querySelectorAll(".card").forEach(c => c.classList.add("hidden"));
+  document.getElementById("login").classList.remove("hidden");
+}
+</script>
+</body>
+</html>
